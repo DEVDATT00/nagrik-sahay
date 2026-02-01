@@ -1,0 +1,185 @@
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Citizen Access Portal | Nagrik Sahayak</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f8fafc;
+    }
+
+    .projection-card {
+      background: #ffffff;
+      border: 1px solid #edf2f7;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+    }
+
+    .auth-tab.active {
+      color: #059669;
+      border-bottom: 2px solid #059669;
+    }
+  </style>
+</head>
+
+<body class="text-slate-800">
+
+  <main class="py-20 flex items-center justify-center min-h-[80vh]">
+    <div class="container mx-auto px-6 max-w-lg">
+
+      <div class="projection-card rounded-[2.5rem] p-10 shadow-2xl">
+
+        <div class="flex gap-8 border-b border-slate-100 mb-8">
+          <button id="loginTab" class="auth-tab active pb-4 text-sm font-black uppercase tracking-widest">
+            Login
+          </button>
+          <button id="registerTab" class="auth-tab pb-4 text-sm font-black uppercase tracking-widest text-slate-400">
+            Register
+          </button>
+        </div>
+
+        <div class="mb-10">
+          <h1 id="formTitle" class="text-2xl font-black text-slate-900">
+            Welcome Back
+          </h1>
+          <p id="formDesc" class="text-sm text-slate-500 mt-2">
+            Enter your credentials to access your civic dashboard.
+          </p>
+        </div>
+
+        <form class="space-y-6">
+
+          <div id="registerFields" class="space-y-6 hidden">
+            <div>
+              <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">Full Name</label>
+              <input id="nameInput" type="text" class="w-full bg-slate-50 border rounded-xl py-4 px-4 font-bold"
+                placeholder="Enter your full name">
+            </div>
+            <div>
+              <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">Aadhaar Number</label>
+              <input id="aadhaarInput" type="text" maxlength="12"
+                class="w-full bg-slate-50 border rounded-xl py-4 px-4 font-bold" placeholder="XXXX XXXX XXXX">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">Mobile Number</label>
+            <div class="relative">
+              <span class="absolute left-4 top-4 text-slate-400 font-bold">+91</span>
+              <input id="mobileInput" type="tel" class="w-full bg-slate-50 border rounded-xl py-4 pl-14 pr-4 font-bold"
+                placeholder="98765 43210">
+            </div>
+          </div>
+
+          <div class="relative">
+            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">Password</label>
+            <input id="passwordInput" type="password" class="w-full bg-slate-50 border rounded-xl py-4 px-4 font-bold"
+              placeholder="••••••••">
+            <button type="button" class="absolute right-4 top-10 text-emerald-600 text-xs font-bold">
+              Forgot?
+            </button>
+          </div>
+
+          <button id="submitBtn" type="submit"
+            class="w-full bg-slate-900 text-white font-black py-5 rounded-2xl hover:bg-emerald-700 uppercase tracking-widest text-xs">
+            Enter Dashboard
+          </button>
+
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+
+      const loginTab = document.getElementById("loginTab");
+      const registerTab = document.getElementById("registerTab");
+      const registerFields = document.getElementById("registerFields");
+
+      const title = document.getElementById("formTitle");
+      const desc = document.getElementById("formDesc");
+      const submitBtn = document.getElementById("submitBtn");
+
+      const name = document.getElementById("nameInput");
+      const aadhaar = document.getElementById("aadhaarInput");
+      const mobile = document.getElementById("mobileInput");
+      const password = document.getElementById("passwordInput");
+
+      let mode = "login";
+
+      loginTab.onclick = () => {
+        mode = "login";
+        registerFields.classList.add("hidden");
+        title.textContent = "Welcome Back";
+        desc.textContent = "Enter your credentials to access your civic dashboard.";
+        submitBtn.textContent = "Enter Dashboard";
+        loginTab.classList.add("active");
+        registerTab.classList.remove("active");
+      };
+
+      registerTab.onclick = () => {
+        mode = "register";
+        registerFields.classList.remove("hidden");
+        title.textContent = "Welcome Citizen";
+        desc.textContent = "Create your account to report civic issues.";
+        submitBtn.textContent = "Create Account";
+        registerTab.classList.add("active");
+        loginTab.classList.remove("active");
+      };
+
+      document.querySelector("form").onsubmit = async (e) => {
+        e.preventDefault();
+
+        const url = mode === "login"
+          ? "http://127.0.0.1:8000/auth/login"
+          : "http://127.0.0.1:8000/auth/register";
+
+        const payload = mode === "login"
+          ? { mobile: mobile.value, password: password.value }
+          : { name: name.value, aadhaar: aadhaar.value, mobile: mobile.value, password: password.value };
+
+        const res = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          alert(data.detail || "Error");
+          return;
+        }
+
+        if (mode === "register") {
+  alert("Registration successful. Please login.");
+  loginTab.click();
+} else {
+  localStorage.setItem("user", JSON.stringify(data));
+  localStorage.setItem("userId", data.id);
+  localStorage.setItem("token", data.token || "no-token-provided");
+
+  const redirect = localStorage.getItem("redirectAfterLogin");
+  if (redirect) {
+    localStorage.removeItem("redirectAfterLogin");
+    window.location.href = redirect;
+  } else {
+    window.location.href = "dashboard.html";
+  }
+}
+
+      };
+    });
+  </script>
+
+</body>
+
+</html>

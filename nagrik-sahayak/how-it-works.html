@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Process & Technology | Nagrik Sahayak</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const userJson = localStorage.getItem('user');
+            const user = userJson ? JSON.parse(userJson) : null;
+
+            const authSection = document.getElementById('auth-section');
+            const userProfileSection = document.getElementById('user-profile-section');
+
+            if (user && user.name) {
+                // ✅ USER IS LOGGED IN: Show Profile
+                authSection.classList.add('hidden');
+                userProfileSection.classList.remove('hidden');
+
+                const registeredName = user.name;
+                document.querySelectorAll('.user-name-target').forEach(el => {
+                    el.textContent = registeredName;
+                });
+
+                const initials = registeredName.split(' ').map(n => n[0]).join('').toUpperCase();
+                document.querySelectorAll('.avatar-target').forEach(el => {
+                    el.textContent = initials;
+                });
+            } else {
+                // ❌ NO USER: Show Login Button
+                authSection.classList.remove('hidden');
+                userProfileSection.classList.add('hidden');
+            }
+        });
+
+        function logoutUser() {
+            localStorage.clear();
+            window.location.href = "auth.html";
+        }
+    </script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; scroll-behavior: smooth; overflow-x: hidden;}
+        
+        .projection-card {
+            background: #ffffff;
+            border: 1px solid #edf2f7;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .projection-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 25px 30px -5px rgba(16, 185, 129, 0.1);
+            border-color: #10b981;
+        }
+
+        /* Crazy Floating Animation */
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(2deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+        .animate-float { animation: float 6s ease-in-out infinite; }
+
+        /* Master Nav Dropdowns */
+        .nav-dropdown:hover .dropdown-content { display: block; }
+        .dropdown-content { display: none; position: absolute; top: 100%; left: 0; min-width: 240px; background: white; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 15px 20px -5px rgba(0,0,0,0.1); z-index: 100; }
+
+        /* Neural Path Line */
+        .neural-path {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent, #10b981, #10b981, transparent);
+            z-index: 0;
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <div class="bg-slate-900 text-white py-2 px-6">
+        <div class="container mx-auto flex justify-between items-center text-[10px] uppercase tracking-widest font-bold">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-microchip"></i>
+                <span>Smart Infrastructure Division</span>
+            </div>
+            <div class="flex gap-6">
+                <a href="faq.html" class="hover:text-emerald-400">Documentation</a>
+                <a href="javascript:void(0)" onclick="logoutUser()" class="hover:text-red-400 transition">Logout</a>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bg-white/95 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <a href="index.html" class="flex items-center gap-3">
+                    <div class="bg-slate-800 p-2 rounded-lg"><i class="fas fa-city text-white text-lg"></i></div>
+                    <span class="text-xl font-black text-slate-900 uppercase tracking-tighter">Nagrik <span class="text-emerald-600">Sahayak</span></span>
+                </a>
+            </div>
+
+            <div class="hidden lg:flex items-center gap-8 font-bold text-xs text-slate-500 uppercase tracking-wider">
+                <div class="relative nav-dropdown py-4">
+                    <button class="text-emerald-600">Explore <i class="fas fa-chevron-down ml-1"></i></button>
+                    <div class="dropdown-content p-2 mt-1">
+                        <a href="how-it-works.html" class="block p-3 font-bold text-emerald-600 bg-emerald-50 rounded underline">How it works</a>
+                        <a href="public-map.html" class="block p-3 hover:bg-slate-50 rounded">Live Map</a>
+                        <a href="about.html" class="block p-3 hover:bg-slate-50 rounded">About Us</a>
+                        <a href="legal.html" class="block p-3 hover:bg-slate-50 rounded">Legal Policy</a>
+                    </div>
+                </div>
+
+                <div class="relative nav-dropdown py-4">
+                    <button class="hover:text-emerald-600">Citizen Services <i class="fas fa-chevron-down ml-1"></i></button>
+                    <div class="dropdown-content p-2 mt-1">
+                        <a href="report.html" class="block p-3 hover:bg-slate-50 rounded font-bold text-emerald-600">Report New Issue</a>
+                        <a href="dashboard.html" class="block p-3 hover:bg-slate-50 rounded">Dashboard</a>
+                        <a href="history.html" class="block p-3 hover:bg-slate-50 rounded">My History</a>
+                        <a href="feedback.html"
+                            class="block p-3 hover:bg-slate-50 rounded">Give
+                            Feedback</a>
+                        <a href="profile.html" class="block p-3 hover:bg-slate-50 rounded">Settings</a>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-4 border-l border-slate-200 pl-8">
+                    
+                    <div id="auth-section" class="hidden">
+                        <a href="auth.html" class="bg-slate-900 text-white px-6 py-2.5 rounded-md hover:bg-emerald-700 transition">Login</a>
+                    </div>
+
+                    <div id="user-profile-section" class="flex items-center gap-4 hidden">
+                        <div class="text-right">
+                            <p class="text-[10px] font-black text-slate-400 leading-none">WELCOME</p>
+                            <p class="text-xs font-bold text-slate-900 user-name-target">Loading...</p>
+                        </div>
+                        <div
+                            class="avatar-target w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 font-bold border-2 border-white shadow-sm">
+                            ??
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </nav>
+
+    <section class="relative pt-32 pb-20 bg-white overflow-hidden">
+        <div class="absolute -top-24 -right-24 w-96 h-96 bg-emerald-50 rounded-full blur-3xl opacity-50"></div>
+        <div class="absolute top-1/2 -left-24 w-72 h-72 bg-slate-100 rounded-full blur-3xl opacity-50"></div>
+        
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="flex flex-col lg:flex-row items-center gap-16">
+                <div class="lg:w-1/2">
+                    <span class="inline-block px-4 py-1 mb-6 text-xs font-black tracking-[0.3em] text-emerald-700 uppercase bg-emerald-100/50 rounded-full">
+                        Next-Gen Civic Tech
+                    </span>
+                    <h1 class="text-6xl lg:text-7xl font-black text-slate-900 mb-8 leading-none tracking-tighter">
+                        Power to the <br><span class="text-emerald-600">Citizen Voice.</span>
+                    </h1>
+                    <p class="text-slate-500 text-xl max-w-xl leading-relaxed mb-10">
+                        We didn't just build a reporting tool. We built a <strong>neural bridge</strong> between your voice and municipal action.
+                    </p>
+                    <div class="flex gap-4">
+                        <a href="#process" class="bg-emerald-600 text-white px-8 py-4 rounded-2xl font-bold hover:bg-emerald-700 transition-all hover:shadow-2xl hover:shadow-emerald-200">The Workflow</a>
+                        <a href="report.html" class="bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold hover:bg-slate-800 transition-all">Report Issue</a>
+                    </div>
+                </div>
+                <div class="lg:w-1/2 relative">
+                    <div class="relative z-20 animate-float">
+                        <img src="https://images.unsplash.com/photo-1573163231162-717df3f80ce8?auto=format&fit=crop&q=80&w=800" class="rounded-[3rem] shadow-2xl border-8 border-white" alt="AI Interface">
+                    </div>
+                    <div class="absolute -bottom-10 -left-10 bg-white p-6 rounded-3xl shadow-xl z-30 border border-slate-100 max-w-[200px]">
+                        <p class="text-[10px] font-black uppercase tracking-widest text-emerald-600 mb-2">System Status</p>
+                        <p class="text-sm font-bold text-slate-800">98.4% Accuracy in Dialect Recognition</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="process" class="py-24 bg-slate-50">
+        <div class="container mx-auto px-6">
+            <h2 class="text-center text-sm font-black uppercase tracking-[0.5em] text-slate-400 mb-16">The Intelligence Loop</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-6 h-auto">
+                <div class="md:col-span-2 md:row-span-1 projection-card p-10 rounded-[2.5rem] flex flex-col justify-between group">
+                    <div>
+                        <div class="w-14 h-14 bg-emerald-600 text-white rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:rotate-12 transition-transform">
+                            <i class="fas fa-microphone-alt"></i>
+                        </div>
+                        <h3 class="text-2xl font-black text-slate-900 mb-4">01. Voice Capture</h3>
+                        <p class="text-slate-500 leading-relaxed">Speak in your mother tongue. Our system supports 12+ regional languages, breaking the barrier between literacy and civic action.</p>
+                    </div>
+                </div>
+
+                <div class="md:col-span-2 md:row-span-2 bg-slate-900 rounded-[2.5rem] p-10 text-white relative overflow-hidden group">
+                    <div class="relative z-10">
+                        <div class="w-14 h-14 bg-white text-slate-900 rounded-2xl flex items-center justify-center text-2xl mb-6">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <h3 class="text-3xl font-black mb-6">02. Neural Analysis</h3>
+                        <p class="text-slate-400 mb-8 leading-relaxed">The AI doesn't just "hear"—it understands. It extracts geo-data, verifies the image authenticity, and determines urgency within seconds.</p>
+                        <ul class="space-y-4">
+                            <li class="flex items-center gap-3 text-sm font-bold text-emerald-400"><i class="fas fa-check-circle"></i> Automatic Geo-Tagging</li>
+                            <li class="flex items-center gap-3 text-sm font-bold text-emerald-400"><i class="fas fa-check-circle"></i> Visual Urgency Verification</li>
+                            <li class="flex items-center gap-3 text-sm font-bold text-emerald-400"><i class="fas fa-check-circle"></i> Form Meta-Generation</li>
+                        </ul>
+                    </div>
+                    <div class="absolute bottom-0 right-0 opacity-10 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-microchip text-[15rem]"></i>
+                    </div>
+                </div>
+
+                <div class="md:col-span-1 md:row-span-1 projection-card p-8 rounded-[2.5rem] group">
+                    <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center text-xl mb-6">
+                        <i class="fas fa-paper-plane"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-900 mb-2">03. Dispatch</h3>
+                    <p class="text-xs text-slate-500">Automated routing to specific municipal divisions with zero human delay.</p>
+                </div>
+
+                <div class="md:col-span-1 md:row-span-1 projection-card p-8 rounded-[2.5rem] group border-emerald-500 bg-emerald-50/30">
+                    <div class="w-12 h-12 bg-emerald-600 text-white rounded-xl flex items-center justify-center text-xl mb-6">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-900 mb-2">04. Resolve</h3>
+                    <p class="text-xs text-slate-500">Continuous monitoring until the "Closed" signal is verified by the user.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-32 bg-white relative">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col lg:flex-row gap-20">
+                <div class="lg:w-1/3">
+                    <h2 class="text-4xl font-black text-slate-900 mb-8 tracking-tighter">Zero Stalling. <br>Full Accountability.</h2>
+                    <p class="text-slate-500 mb-8 leading-relaxed">
+                        Our "Anti-Stall" logic ensures that no file gathers dust. If the system detects inactivity, the escalation engine triggers a hierarchy of alerts.
+                    </p>
+                    <div class="p-6 bg-slate-900 rounded-3xl text-white">
+                        <p class="text-emerald-400 font-bold mb-2">Automated Follow-up</p>
+                        <p class="text-sm text-slate-400">The system calls the official's dashboard every 24 hours until the status is updated.</p>
+                    </div>
+                </div>
+
+                <div class="lg:w-2/3 relative pl-12">
+                    <div class="neural-path"></div>
+                    
+                    <div class="space-y-12">
+                        <div class="relative flex items-center gap-8 group">
+                            <div class="w-6 h-6 bg-emerald-500 rounded-full relative z-10 shadow-[0_0_20px_rgba(16,185,129,0.5)]"></div>
+                            <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 flex-1 hover:border-emerald-500 transition-colors">
+                                <span class="text-[10px] font-black text-emerald-600 uppercase">T + 0 Hours</span>
+                                <h4 class="font-bold text-slate-900">Direct Department Ticketing</h4>
+                                <p class="text-sm text-slate-500">Instant notification to the ground-level officer with GPS data.</p>
+                            </div>
+                        </div>
+
+                        <div class="relative flex items-center gap-8 group">
+                            <div class="w-6 h-6 bg-orange-500 rounded-full relative z-10 shadow-[0_0_20px_rgba(249,115,22,0.5)]"></div>
+                            <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 flex-1 hover:border-orange-500 transition-colors">
+                                <span class="text-[10px] font-black text-orange-600 uppercase">T + 48 Hours</span>
+                                <h4 class="font-bold text-slate-900">Priority Nudge</h4>
+                                <p class="text-sm text-slate-500">Complaint flag turns orange. Internal reminders sent to the HOD.</p>
+                            </div>
+                        </div>
+
+                        <div class="relative flex items-center gap-8 group">
+                            <div class="w-6 h-6 bg-red-600 rounded-full relative z-10 shadow-[0_0_20px_rgba(220,38,38,0.5)]"></div>
+                            <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 flex-1 group-hover:border-red-500 transition-colors">
+                                <span class="text-[10px] font-black text-red-500 uppercase">T + 7 Days</span>
+                                <h4 class="font-bold text-white uppercase tracking-widest">Senior Official Escalation</h4>
+                                <p class="text-sm text-slate-400">Direct bypass to Municipal Commissioner's oversight dashboard.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-slate-50 text-slate-700 border-t border-slate-200 pt-16 pb-8">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+
+                <div class="col-span-1 lg:col-span-1">
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="bg-emerald-600 p-1.5 rounded-lg">
+                            <i class="fas fa-robot text-white text-xl"></i>
+                        </div>
+                        <span class="text-2xl font-bold text-slate-900 tracking-tight">Nagrik Sahayak</span>
+                    </div>
+                    <p class="text-slate-500 leading-relaxed">
+                        Simplifying civic action through AI. Report issues in your regional language and let our smart
+                        system handle the tracking and escalation.
+                    </p>
+                </div>
+
+                <div>
+                    <h3 class="text-slate-900 font-bold mb-6 uppercase text-sm tracking-widest">Report Issues</h3>
+                    <ul class="space-y-4">
+                        <li><a href="#" class="hover:text-emerald-600 transition-colors flex items-center gap-2"><i
+                                    class="fas fa-road text-xs opacity-50"></i> Potholes & Roads</a></li>
+                        <li><a href="#" class="hover:text-emerald-600 transition-colors flex items-center gap-2"><i
+                                    class="fas fa-trash text-xs opacity-50"></i> Waste Management</a></li>
+                        <li><a href="#" class="hover:text-emerald-600 transition-colors flex items-center gap-2"><i
+                                    class="fas fa-lightbulb text-xs opacity-50"></i> Street Lighting</a></li>
+                        <li><a href="#" class="hover:text-emerald-600 transition-colors flex items-center gap-2"><i
+                                    class="fas fa-tint text-xs opacity-50"></i> Water Leakage</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-slate-900 font-bold mb-6 uppercase text-sm tracking-widest">Citizen Hub</h3>
+                    <ul class="space-y-4">
+                        <li><a href="#" class="hover:text-emerald-600 transition-colors">Track Complaint</a></li>
+                        <li><a href="#" class="hover:text-emerald-600 transition-colors">Regional Language Support</a>
+                        </li>
+                        <li><a href="#" class="hover:text-emerald-600 transition-colors">AI Verification Process</a>
+                        </li>
+                        <li><a href="#" class="hover:text-emerald-600 transition-colors">Escalation Policy</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-slate-900 font-bold mb-6 uppercase text-sm tracking-widest">Get in Touch</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-phone mt-1 text-emerald-600"></i>
+                            <div>
+                                <p class="text-slate-900 font-bold">+1 (800) 555-PEER</p>
+                                <p class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Toll Free
+                                    Support</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-envelope mt-1 text-emerald-600"></i>
+                            <div>
+                                <p class="text-slate-900 font-bold">support@nagriksahayak.gov</p>
+                                <p class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Official
+                                    Correspondence</p>
+                            </div>
+                        </div>
+                        <div class="mt-6 p-4 bg-emerald-50 rounded-xl border border-emerald-100">
+                            <p class="text-xs text-emerald-800 leading-tight">
+                                <strong>Note:</strong> Voice-based status updates are available 24/7 via the citizen
+                                dashboard.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-slate-200 pt-8 text-center">
+                <div class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+                    © 2026 Nagrik Sahayak • Citizen Hub Services
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+</body>
+</html>

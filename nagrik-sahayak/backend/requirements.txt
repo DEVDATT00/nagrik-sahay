@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+sqlalchemy
+pydantic
+python-dotenv
+sendgrid
+passlib[bcrypt]
+python-multipart
+pillow
+numpy
+google-generativeai
+SpeechRecognition
+reportlab
+gradio

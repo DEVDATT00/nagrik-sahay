@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Report | Nagrik Sahayak AI</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const userJson = localStorage.getItem('user');
+            const user = userJson ? JSON.parse(userJson) : null;
+
+            const authSection = document.getElementById('auth-section');
+            const userProfileSection = document.getElementById('user-profile-section');
+
+            if (user && user.name) {
+                // ✅ USER IS LOGGED IN: Show Profile
+                authSection.classList.add('hidden');
+                userProfileSection.classList.remove('hidden');
+
+                const registeredName = user.name;
+                document.querySelectorAll('.user-name-target').forEach(el => {
+                    el.textContent = registeredName;
+                });
+
+                const initials = registeredName.split(' ').map(n => n[0]).join('').toUpperCase();
+                document.querySelectorAll('.avatar-target').forEach(el => {
+                    el.textContent = initials;
+                });
+            } else {
+                // ❌ NO USER: Show Login Button
+                authSection.classList.remove('hidden');
+                userProfileSection.classList.add('hidden');
+            }
+        });
+
+        function logoutUser() {
+            localStorage.clear();
+            window.location.href = "auth.html";
+        }
+    </script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+    
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+    
+        .projection-card {
+            background: #ffffff;
+            border: 1px solid #edf2f7;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+            transition: all 0.3s ease;
+        }
+    
+        .bg-tinted-mix {
+            background-color: #f0f4f2;
+        }
+    
+        /* Dropdown */
+        .nav-dropdown:hover .dropdown-content {
+            display: block;
+        }
+    
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            min-width: 220px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+    
+        /* Recording state */
+        .is-recording {
+            animation: pulse-red 1.5s infinite;
+            background-color: #ef4444 !important;
+        }
+    
+        /* Image error state */
+        .image-error {
+            border-color: #ef4444 !important;
+            background-color: #fef2f2;
+        }
+    
+        @keyframes pulse-red {
+            0% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 20px rgba(239, 68, 68, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+            }
+        }
+    </style>
+    
+</head>
+
+<body class="text-slate-800">
+
+<div class="bg-slate-900 text-white py-2 px-6">
+    <div class="container mx-auto flex justify-between items-center text-[10px] uppercase tracking-widest font-bold">
+        
+        <div class="flex items-center gap-2">
+            <i class="fas fa-landmark"></i>
+            <span>Official Government Portal</span>
+        </div>
+
+        <div class="flex gap-6">
+            <a href="faq.html" class="hover:text-emerald-400">FAQ</a>
+            <a href="legal.html" class="hover:text-emerald-400">Privacy Policy</a>
+        </div>
+
+    </div>
+</div>
+
+<nav class="bg-white/90 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200">
+    <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+
+        <a href="index.html" class="flex items-center gap-3">
+            <div class="bg-slate-800 p-2 rounded-lg">
+                <i class="fas fa-city text-white"></i>
+            </div>
+            <span class="text-xl font-black text-slate-900 uppercase tracking-tighter">
+                Nagrik <span class="text-emerald-600">Sahayak</span>
+            </span>
+        </a>
+
+        <div class="hidden lg:flex items-center gap-8 font-bold text-xs text-slate-500 uppercase tracking-wider">
+
+            <div class="relative nav-dropdown py-4">
+                <button class="hover:text-emerald-600">
+                    Explore <i class="fas fa-chevron-down ml-1"></i>
+                </button>
+
+                <div class="dropdown-content p-2 mt-1">
+                    <a href="how-it-works.html" class="block p-3 hover:bg-slate-50 rounded">How it works</a>
+                    <a href="public-map.html" class="block p-3 hover:bg-slate-50 rounded">Live Map</a>
+                    <a href="about.html" class="block p-3 hover:bg-slate-50 rounded">About Us</a>
+                </div>
+            </div>
+
+            <div class="relative nav-dropdown py-4">
+                <button class="text-emerald-600">
+                    Citizen Services <i class="fas fa-chevron-down ml-1"></i>
+                </button>
+
+                <div class="dropdown-content p-2 mt-1">
+                    <a href="report.html"
+                       class="block p-3 font-bold text-emerald-600 bg-emerald-50 rounded underline">
+                        Report New Issue
+                    </a>
+                    <a href="dashboard.html" class="block p-3 hover:bg-slate-50 rounded">Dashboard</a>
+                    <a href="history.html" class="block p-3 hover:bg-slate-50 rounded">My History</a>
+                    <a href="feedback.html"
+                            class="block p-3 hover:bg-slate-50 rounded">Give
+                            Feedback</a>
+                    <a href="profile.html" class="block p-3 hover:bg-slate-50 rounded">Settings</a>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4 border-l border-slate-200 pl-8">
+                
+                <div id="auth-section" class="hidden">
+                    <a href="auth.html" class="bg-slate-900 text-white px-6 py-2.5 rounded-md hover:bg-emerald-700 transition">Login</a>
+                </div>
+
+                <div id="user-profile-section" class="flex items-center gap-4 hidden">
+                    <div class="text-right">
+                        <p class="text-[10px] font-black text-slate-400 leading-none">WELCOME</p>
+                        <p class="text-xs font-bold text-slate-900 user-name-target">Loading...</p>
+                    </div>
+                    <div class="avatar-target w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 font-bold border-2 border-white shadow-sm">
+                        ??
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</nav>
+
+<main class="py-16">
+<div class="container mx-auto px-6 max-w-6xl">
+
+<div class="grid lg:grid-cols-3 gap-8">
+
+<div class="lg:col-span-2 space-y-6">
+
+<div class="flex justify-center mb-4">
+    <div class="inline-flex rounded-xl border border-slate-200 overflow-hidden w-fit">
+        <button id="lang-hi"
+        class="px-6 py-2 min-w-[100px] text-sm font-bold bg-emerald-600 text-white text-center">
+        हिंदी
+      </button>
+      
+      <button id="lang-en"
+        class="px-6 py-2 min-w-[100px] text-sm font-bold bg-white text-slate-600 text-center">
+        English
+      </button>
+      
+    </div>
+</div>
+
+<div class="projection-card p-10 rounded-[2rem] text-center">
+    <h2 class="text-xl font-bold mb-4">Describe the Issue</h2>
+    <button id="mic-button" class="w-24 h-24 bg-emerald-600 text-white rounded-full text-3xl">
+        <i class="fas fa-microphone"></i>
+    </button>
+    <p id="mic-status" class="mt-4 text-slate-400">Tap to start hardware recording</p>
+</div>
+<button
+  id="generate-report-btn"
+  class="mt-6 w-full bg-emerald-600 text-white py-4 rounded-xl font-bold disabled:opacity-40"
+  disabled
+>
+  Generate AI Report
+</button>
+
+<div id="ai-result-container" class="hidden">
+    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">
+        AI Formulated Complaint
+    </label>
+
+    <textarea id="issue-description-box" rows="6"
+        class="w-full bg-white border rounded-2xl p-6 resize-none overflow-y-auto"></textarea>
+
+    <button id="download-pdf-btn"
+        class="mt-4 bg-emerald-600 text-white px-6 py-3 rounded-xl font-bold">
+        Download Report (PDF)
+    </button>
+</div>
+
+<div class="grid md:grid-cols-2 gap-6">
+
+<div onclick="document.getElementById('imageInput').click()"
+     class="projection-card aspect-square rounded-2xl border-dashed border-2 cursor-pointer relative overflow-hidden">
+    <input type="file" id="imageInput" accept="image/*" class="hidden">
+    <div id="image-placeholder"
+     class="absolute inset-0 flex items-center justify-center text-slate-400">
+    Add Photo Evidence
+</div>
+
+<img id="image-preview"
+     class="absolute inset-0 w-full h-full object-cover hidden" />
+
+</div>
+
+<div class="projection-card aspect-square rounded-2xl overflow-hidden">
+    <div id="map-picker" class="w-full h-full"></div>
+</div>
+
+</div>
+</div>
+
+<div class="projection-card p-6 rounded-2xl sticky top-24">
+    <h3 class="font-bold mb-4">AI Audit Log</h3>
+    <div id="audit-log"
+         class="bg-slate-900 rounded-xl p-4 text-xs font-mono text-emerald-400 h-[300px] overflow-y-auto">
+        <div id="log-entries">// System Ready...</div>
+    </div>
+
+    <button id="final-submit-btn"
+        class="mt-6 w-full bg-slate-900 text-white py-4 rounded-xl opacity-30"
+        disabled>
+        Submit Final Report
+    </button>
+</div>
+
+
+
+</div>
+<footer class="bg-slate-50 text-slate-700 border-t border-slate-200 pt-16 pb-8">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+
+                <div class="col-span-1 lg:col-span-1">
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="bg-emerald-600 p-1.5 rounded-lg">
+                            <i class="fas fa-robot text-white text-xl"></i>
+                        </div>
+                        <span class="text-2xl font-bold text-slate-900 tracking-tight">Nagrik Sahayak</span>
+                    </div>
+                    <p class="text-slate-500 leading-relaxed">
+                        Simplifying civic action through AI. Report issues in your regional language and let our smart
+                        system handle the tracking and escalation.
+                    </p>
+                </div>
+
+                <div>
+                    <h3 class="text-slate-900 font-bold mb-6 uppercase text-sm tracking-widest">Report Issues</h3>
+                    <ul class="space-y-4">
+                        <li><a href="#" class="hover:text-emerald-600 transition-colors flex items-center gap-2"><i
+                                    class="fas fa-road text-xs opacity-50"></i> Potholes & Roads</a></li>
+                        <li><a href="#" class="hover:text-emerald-600 transition-colors flex items-center gap-2"><i
+                                    class="fas fa-trash text-xs opacity-50"></i> Waste Management</a></li>
+                        <li><a href="#" class="hover:text-emerald-600 transition-colors flex items-center gap-2"><i
+                                    class="fas fa-lightbulb text-xs opacity-50"></i> Street Lighting</a></li>
+                        <li><a href="#" class="hover:text-emerald-600 transition-colors flex items-center gap-2"><i
+                                    class="fas fa-tint text-xs opacity-50"></i> Water Leakage</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-slate-900 font-bold mb-6 uppercase text-sm tracking-widest">Citizen Hub</h3>
+                    <ul class="space-y-4">
+                        <li><a href="#" class="hover:text-emerald-600 transition-colors">Track Complaint</a></li>
+                        <li><a href="#" class="hover:text-emerald-600 transition-colors">Regional Language Support</a>
+                        </li>
+                        <li><a href="#" class="hover:text-emerald-600 transition-colors">AI Verification Process</a>
+                        </li>
+                        <li><a href="#" class="hover:text-emerald-600 transition-colors">Escalation Policy</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-slate-900 font-bold mb-6 uppercase text-sm tracking-widest">Get in Touch</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-phone mt-1 text-emerald-600"></i>
+                            <div>
+                                <p class="text-slate-900 font-bold">+1 (800) 555-PEER</p>
+                                <p class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Toll Free
+                                    Support</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-envelope mt-1 text-emerald-600"></i>
+                            <div>
+                                <p class="text-slate-900 font-bold">support@nagriksahayak.gov</p>
+                                <p class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Official
+                                    Correspondence</p>
+                            </div>
+                        </div>
+                        <div class="mt-6 p-4 bg-emerald-50 rounded-xl border border-emerald-100">
+                            <p class="text-xs text-emerald-800 leading-tight">
+                                <strong>Note:</strong> Voice-based status updates are available 24/7 via the citizen
+                                dashboard.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-slate-200 pt-8 text-center">
+                <div class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+                    © 2026 Nagrik Sahayak • Citizen Hub Services
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</div>
+</main>
+
+<script>
+    /* ================= GLOBAL STATE ================= */
+    window.imageAnalysis = null;
+    window.selectedLocation = null;
+    
+    let selectedLanguage = "hi-IN";
+    let voiceData = null;
+    let isProcessing = false;
+    
+    /* ================= ELEMENTS ================= */
+    const micBtn = document.getElementById("mic-button");
+    const micStatus = document.getElementById("mic-status");
+    
+    const imageInput = document.getElementById("imageInput");
+    const imagePreview = document.getElementById("image-preview");
+    const imagePlaceholder = document.getElementById("image-placeholder");
+    
+    const logEntries = document.getElementById("log-entries");
+    
+    const resultBox = document.getElementById("issue-description-box");
+    const resultContainer = document.getElementById("ai-result-container");
+    
+    const langHiBtn = document.getElementById("lang-hi");
+    const langEnBtn = document.getElementById("lang-en");
+    
+    const generateBtn = document.getElementById("generate-report-btn");
+    const downloadBtn = document.getElementById("download-pdf-btn");
+    const submitBtn = document.getElementById("final-submit-btn");
+
+    /* ================= UTILS ================= */
+    function addLog(msg) {
+      logEntries.innerHTML += `<br>${msg}`;
+      logEntries.scrollTop = logEntries.scrollHeight;
+    }
+    
+    /* ================= LANGUAGE TOGGLE ================= */
+    langHiBtn.onclick = () => {
+      selectedLanguage = "hi-IN";
+      langHiBtn.classList.add("bg-emerald-600", "text-white");
+      langHiBtn.classList.remove("bg-white", "text-slate-600");
+      langEnBtn.classList.remove("bg-emerald-600", "text-white");
+      langEnBtn.classList.add("bg-white", "text-slate-600");
+      addLog("🌐 Language set to Hindi");
+    };
+    
+    langEnBtn.onclick = () => {
+      selectedLanguage = "en-IN";
+      langEnBtn.classList.add("bg-emerald-600", "text-white");
+      langEnBtn.classList.remove("bg-white", "text-slate-600");
+      langHiBtn.classList.remove("bg-emerald-600", "text-white");
+      langHiBtn.classList.add("bg-white", "text-slate-600");
+      addLog("🌐 Language set to English");
+    };
+    
+    /* ================= READY CHECK ================= */
+    function checkGenerateReady() {
+      if (!voiceData || !window.selectedLocation) return;
+    
+      const imageRequiredIssues = ["Pothole", "Garbage", "Broken Road", "Open Manhole"];
+      const imageRequired = imageRequiredIssues.includes(voiceData.issue_type);
+    
+      if (imageRequired && !window.imageAnalysis) {
+        addLog("📷 Image required before report generation");
+        return;
+      }
+    
+      if (generateBtn) generateBtn.disabled = false;
+      addLog("✅ Ready to generate AI report");
+    }
+    
+    /* ================= MIC BUTTON WITH LOGIN GATE ================= */
+    micBtn.onclick = async () => {
+      if (isProcessing) return;
+
+      // 🎯 1. LOGIN CHECK (PRIORITY 1)
+      const userJson = localStorage.getItem('user');
+      const user = userJson ? JSON.parse(userJson) : null;
+      if (!user || !user.name) {
+          alert("Login First");
+          return;
+      }
+    
+      // 🎯 2. LOCATION CHECK (PRIORITY 2)
+      if (!window.selectedLocation) {
+        alert("Please select a location first.");
+        return;
+      }
+    
+      isProcessing = true;
+      micBtn.disabled = true;
+      micBtn.classList.add("is-recording");
+    
+      micStatus.innerText = "Listening (backend mic)...";
+      addLog("🎙 Voice capture started");
+    
+      try {
+        const res = await fetch("http://127.0.0.1:8000/complaint/trigger-mic", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            location: window.selectedLocation,
+            language: selectedLanguage,
+            image_analysis: window.imageAnalysis
+          })
+        });
+    
+        const data = await res.json();
+    
+        if (!data.success) {
+          alert(data.error);
+          return;
+        }
+    
+        voiceData = {
+          issue_type: data.issue_type,
+          translated_text: data.translated_text
+        };
+    
+        resultContainer.classList.remove("hidden");
+        resultBox.value = data.translated_text;
+    
+        addLog(`🗣 Voice captured: ${data.issue_type}`);
+        micStatus.innerText = "Voice captured";
+    
+        checkGenerateReady();
+    
+      } catch {
+        addLog("⚠️ Backend offline (voice skipped)");
+        micStatus.innerText = "Backend offline (demo mode)";
+      }
+    
+      micBtn.classList.remove("is-recording");
+      micBtn.disabled = false;
+      isProcessing = false;
+    };
+    
+    /* ================= IMAGE UPLOAD ================= */
+    imageInput.onchange = async () => {
+      const file = imageInput.files[0];
+      if (!file) return;
+    
+      if (imagePreview && imagePlaceholder) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          imagePreview.src = e.target.result;
+          imagePreview.classList.remove("hidden");
+          imagePlaceholder.classList.add("hidden");
+        };
+        reader.readAsDataURL(file);
+      }
+    
+      addLog("🖼 Image selected");
+    
+      const fd = new FormData();
+      fd.append("image", file);
+    
+      try {
+        addLog("🧠 Sending image to AI...");
+        const res = await fetch("http://127.0.0.1:8000/complaint/analyze-image", {
+          method: "POST",
+          body: fd
+        });
+    
+        const data = await res.json();
+        window.imageAnalysis = data;
+    
+        addLog(`✅ Image analyzed (${data.issue_type || "unknown"})`);
+        checkGenerateReady();
+    
+      } catch {
+        addLog("⚠️ Backend offline (image skipped)");
+      }
+    };
+    
+    /* ================= MAP ================= */
+const map = L.map("map-picker").setView([23.0225, 72.5714], 13);
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
+const marker = L.marker([23.0225, 72.5714], { draggable: true }).addTo(map);
+
+marker.on("dragend", async () => {
+  const p = marker.getLatLng();
+  try {
+    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${p.lat}&lon=${p.lng}`);
+    const d = await res.json();
+    window.selectedLocation = {
+      area: d.address.suburb || d.address.city || "Unknown",
+      latitude: p.lat,
+      longitude: p.lng
+    };
+    addLog(`📍 Location set: ${window.selectedLocation.area}`);
+    checkGenerateReady();
+  } catch {
+    window.selectedLocation = { area: "Unknown", latitude: p.lat, longitude: p.lng };
+    addLog("📍 Location set (offline)");
+  }
+});
+
+    
+    /* ================= GENERATE REPORT ================= */
+    if (generateBtn) {
+      generateBtn.onclick = async () => {
+        addLog("🧠 Generating AI report...");
+    
+        try {
+            const userId = localStorage.getItem("userId");   // ✅ ADD THIS
+
+const res = await fetch("http://127.0.0.1:8000/complaint/final-generate", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    user_id: userId,                             // ✅ ADD THIS
+    issue_type: voiceData.issue_type,
+    translated_text: voiceData.translated_text,
+    location: window.selectedLocation,
+    image_analysis: window.imageAnalysis
+  })
+});
+
+
+    
+          const data = await res.json();
+          window.currentComplaintId = data.complaint_id;   // ✅ SAVE complaint_id
+
+    
+          if (!data.success) {
+            alert(data.error);
+            return;
+          }
+    
+          resultBox.value = data.complaint;
+        resultContainer.classList.remove("hidden");
+        submitBtn.disabled = false;
+        submitBtn.classList.remove("opacity-30");
+        submitBtn.innerText = "Submit Final Report";
+        submitBtn.classList.add("hover:bg-emerald-700");
+        addLog("✅ AI report generated");
+        addLog("📤 Ready to submit report");
+    
+        } catch {
+          alert("Backend not reachable");
+          addLog("❌ Backend not reachable");
+        }
+      };
+    }
+    
+    /* ================= DOWNLOAD PDF ================= */
+    if (downloadBtn) {
+      downloadBtn.onclick = async () => {
+        if (!resultBox.value) {
+          alert("No report to download");
+          return;
+        }
+        const res = await fetch("http://127.0.0.1:8000/complaint/download-pdf", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ complaint: resultBox.value })
+        });
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "Nagrik_Sahayak_Complaint.pdf";
+        a.click();
+        addLog("📄 PDF downloaded");
+      };
+    }
+
+    /* ================= FINAL SUBMIT ================= */
+    document.getElementById("final-submit-btn").onclick = async () => {
+        if (!resultBox.value) {
+            alert("No report generated yet");
+            return;
+        }
+        addLog("📨 Sending report to municipality...");
+        const res = await fetch("http://127.0.0.1:8000/complaint/submit-email", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+    complaint_id: window.currentComplaintId,   // ✅ ADD THIS
+    description: resultBox.value,
+    city: window.selectedLocation.area,
+    urgency: window.imageAnalysis?.urgency || "Normal"
+})
+
+        });
+        const data = await res.json();
+        if (!data.success) {
+            alert(data.error);
+            addLog("❌ Submission failed");
+            return;
+        }
+        addLog(`✅ Submitted successfully`);
+        addLog(`📌 Reference ID: ${data.reference_id}`);
+        alert("Complaint submitted successfully!\n\nReference ID: " + data.reference_id);
+    };
+
+    </script>
+</body>
+</html>

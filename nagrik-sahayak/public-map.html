@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Public Transparency Map | Nagrik Sahayak</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // 1. DYNAMIC HEADER LOGIC
+            const userJson = localStorage.getItem('user');
+            const user = userJson ? JSON.parse(userJson) : null;
+            const authSection = document.getElementById('auth-section');
+            const userProfileSection = document.getElementById('user-profile-section');
+
+            if (user && user.name) {
+                authSection.classList.add('hidden');
+                userProfileSection.classList.remove('hidden');
+                document.querySelectorAll('.user-name-target').forEach(el => el.textContent = user.name);
+                const initials = user.name.split(' ').map(n => n[0]).join('').toUpperCase();
+                document.querySelectorAll('.avatar-target').forEach(el => el.textContent = initials);
+            } else {
+                authSection.classList.remove('hidden');
+                userProfileSection.classList.add('hidden');
+            }
+
+            // 2. INITIALIZE REAL MAP (Ahmedabad Center)
+            const map = L.map('city-map').setView([23.0225, 72.5714], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
+
+            // 3. EXPANDED REALISTIC DATA POINTS (Mocking City Data)
+            const activeIssues = [
+                { lat: 23.0351, lng: 72.5885, type: 'Roads', title: 'Pothole in Dariyapur', status: 'In Progress' },
+                { lat: 23.0345, lng: 72.5624, type: 'Lighting', title: 'Broken Street Light Ambawadi', status: 'Open' },
+                { lat: 23.0120, lng: 72.5120, type: 'Water', title: 'Pipeline Leak Madhupura', status: 'Resolved' },
+                { lat: 23.0189, lng: 72.5663, type: 'Waste', title: 'Garbage Dump Kochrab', status: 'Open' },
+                { lat: 23.0120, lng: 72.5596, type: 'Roads', title: 'Damaged Road Paldi', status: 'In Progress' },
+                { lat: 23.0371, lng: 72.5606, type: 'Lighting', title: 'Flickering Street Light Navrangpura', status: 'Resolved' },
+                { lat: 23.0361, lng: 72.5297, type: 'Waste', title: 'Overflowing Bin Vastrapur', status: 'In Progress' },
+                { lat: 23.0305, lng: 72.5178, type: 'Water', title: 'Water Stagnation Satellite', status: 'Open' },
+                { lat: 22.9972, lng: 72.5997, type: 'Roads', title: 'Open Manhole Maninagar', status: 'Open' },
+                { lat: 23.0504, lng: 72.5668, type: 'Lighting', title: 'Dark Patch Usmanpura', status: 'In Progress' },
+                { lat: 23.0286, lng: 72.5539, type: 'Water', title: 'Leakage Gulbai Tekra', status: 'Resolved' },
+                { lat: 23.0450, lng: 72.5350, type: 'Waste', title: 'Litter in Bhavna Colony', status: 'Resolved' }
+            ];
+
+            // Add markers to map with status colors
+            activeIssues.forEach(issue => {
+                const color = issue.status === 'Resolved' ? '#10b981' : (issue.status === 'Open' ? '#ef4444' : '#f59e0b');
+                const markerIcon = L.divIcon({
+                    className: 'custom-div-icon',
+                    html: `<div style="background-color:${color}; width:15px; height:15px; border-radius:50%; border:2px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.2)"></div>`,
+                    iconSize: [15, 15],
+                    iconAnchor: [7, 7]
+                });
+
+                L.marker([issue.lat, issue.lng], { icon: markerIcon })
+                    .addTo(map)
+                    .bindPopup(`
+                        <div class="p-2">
+                            <p class="text-[10px] font-black uppercase text-slate-400 mb-1">${issue.type}</p>
+                            <h4 class="font-bold text-slate-900">${issue.title}</h4>
+                            <div class="mt-2 flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full" style="background-color:${color}"></span>
+                                <span class="text-[10px] font-bold uppercase" style="color:${color}">${issue.status}</span>
+                            </div>
+                        </div>
+                    `);
+            });
+        });
+
+        function logoutUser() {
+            localStorage.clear();
+            window.location.href = "auth.html";
+        }
+    </script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        
+        .projection-card {
+            background: #ffffff;
+            border: 1px solid #edf2f7;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+            transition: all 0.3s ease;
+        }
+
+        .nav-dropdown:hover .dropdown-content { display: block; }
+        .dropdown-content { 
+            display: none; position: absolute; top: 100%; left: 0; min-width: 240px; 
+            background: white; border: 1px solid #e2e8f0; border-radius: 12px; 
+            box-shadow: 0 15px 20px -5px rgba(0,0,0,0.1); z-index: 1000; 
+        }
+
+        #city-map { width: 100%; height: 100%; z-index: 1; border-radius: 2rem; }
+        
+        /* Map Popup Customization */
+        .leaflet-popup-content-wrapper { border-radius: 1rem; padding: 5px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .leaflet-popup-tip { display: none; }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <div class="bg-slate-900 text-white py-2 px-6">
+        <div class="container mx-auto flex justify-between items-center text-[10px] uppercase tracking-widest font-bold">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-satellite"></i>
+                <span>Live Transparency & Geospatial Division</span>
+            </div>
+            <div class="flex gap-6">
+                <a href="faq.html" class="hover:text-emerald-400">API Documentation</a>
+                <a href="javascript:void(0)" onclick="logoutUser()" class="hover:text-red-400 transition">Logout</a>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bg-white/95 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <a href="index.html" class="flex items-center gap-3">
+                    <div class="bg-slate-800 p-2 rounded-lg"><i class="fas fa-city text-white text-lg"></i></div>
+                    <span class="text-xl font-black text-slate-900 uppercase tracking-tighter">Nagrik <span class="text-emerald-600">Sahayak</span></span>
+                </a>
+            </div>
+
+            <div class="hidden lg:flex items-center gap-8 font-bold text-xs text-slate-500 uppercase tracking-wider">
+                <div class="relative nav-dropdown py-4">
+                    <button class="text-emerald-600">Explore <i class="fas fa-chevron-down ml-1"></i></button>
+                    <div class="dropdown-content p-2 mt-1">
+                        <a href="how-it-works.html" class="block p-3 hover:bg-slate-50 rounded">How it works</a>
+                        <a href="public-map.html" class="block p-3 hover:bg-slate-50 rounded font-bold text-emerald-600 bg-emerald-50 underline">Live Map</a>
+                        <a href="about.html" class="block p-3 hover:bg-slate-50 rounded">About Us</a>
+                        <a href="legal.html" class="block p-3 hover:bg-slate-50 rounded">Legal Policy</a>
+                    </div>
+                </div>
+
+                <div class="relative nav-dropdown py-4">
+                    <button class="hover:text-emerald-600">Citizen Services <i class="fas fa-chevron-down ml-1"></i></button>
+                    <div class="dropdown-content p-2 mt-1">
+                        <a href="report.html" class="block p-3 hover:bg-slate-50 rounded font-bold text-emerald-600">Report New Issue</a>
+                        <a href="dashboard.html" class="block p-3 hover:bg-slate-50 rounded">Dashboard</a>
+                        <a href="history.html" class="block p-3 hover:bg-slate-50 rounded">My History</a>
+                        <a href="feedback.html"
+                            class="block p-3 hover:bg-slate-50 rounded">Give
+                            Feedback</a>
+                        <a href="profile.html" class="block p-3 hover:bg-slate-50 rounded">Settings</a>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-4 border-l border-slate-200 pl-8">
+                    <div id="auth-section" class="hidden">
+                        <a href="auth.html" class="bg-slate-900 text-white px-6 py-2.5 rounded-md hover:bg-emerald-700 transition">Login</a>
+                    </div>
+                    <div id="user-profile-section" class="flex items-center gap-4 hidden">
+                        <div class="text-right">
+                            <p class="text-[10px] font-black text-slate-400 leading-none">WELCOME</p>
+                            <p class="text-xs font-bold text-slate-900 user-name-target">Loading...</p>
+                        </div>
+                        <div class="avatar-target w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 font-bold border-2 border-white shadow-sm">??</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <header class="py-12 bg-white border-b border-slate-100">
+        <div class="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div>
+                <h1 class="text-3xl font-extrabold text-slate-900">City Incident Map</h1>
+                <p class="text-slate-500">Real-time visualization of reported civic issues and resolution status.</p>
+            </div>
+            <div class="flex gap-4">
+                <div class="bg-emerald-50 border border-emerald-100 px-6 py-3 rounded-xl text-center shadow-sm">
+                    <p class="text-[10px] font-black text-emerald-600 uppercase tracking-widest">total Resolved </p>
+                    <p class="text-2xl font-black text-slate-900">142</p>
+                </div>
+                <div class="bg-red-50 border border-red-100 px-6 py-3 rounded-xl text-center shadow-sm">
+                    <p class="text-[10px] font-black text-red-600 uppercase tracking-widest">Active Alerts</p>
+                    <p class="text-2xl font-black text-slate-900">28</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+        <div class="grid lg:grid-cols-4 gap-8 h-[700px]">
+            
+            <div class="lg:col-span-1 space-y-6 overflow-y-auto pr-2">
+                <div class="projection-card p-6 rounded-2xl">
+                    <h3 class="font-bold text-sm uppercase tracking-widest text-slate-400 mb-6">Filter by Category</h3>
+                    <div class="space-y-3">
+                        <label class="flex items-center gap-3 cursor-pointer p-2 hover:bg-slate-50 rounded-lg">
+                            <input type="checkbox" class="w-4 h-4 accent-emerald-600" checked>
+                            <span class="text-sm font-semibold text-slate-600">Roads & Potholes</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer p-2 hover:bg-slate-50 rounded-lg">
+                            <input type="checkbox" class="w-4 h-4 accent-emerald-600" checked>
+                            <span class="text-sm font-semibold text-slate-600">Waste Management</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer p-2 hover:bg-slate-50 rounded-lg">
+                            <input type="checkbox" class="w-4 h-4 accent-emerald-600" checked>
+                            <span class="text-sm font-semibold text-slate-600">Street Lights</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer p-2 hover:bg-slate-50 rounded-lg">
+                            <input type="checkbox" class="w-4 h-4 accent-emerald-600" checked>
+                            <span class="text-sm font-semibold text-slate-600">Water Leakage</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="projection-card p-6 rounded-2xl">
+                    <h3 class="font-bold text-sm uppercase tracking-widest text-slate-400 mb-6">Recent Live Feed</h3>
+                    <div class="space-y-4">
+                        <div class="border-l-4 border-red-500 pl-4 py-1 bg-slate-50 rounded-r-lg">
+                            <p class="text-xs font-bold text-slate-800">Broken Pipeline</p>
+                            <p class="text-[10px] text-slate-400 italic">Sector 4 • 12 mins ago</p>
+                        </div>
+                        <div class="border-l-4 border-emerald-500 pl-4 py-1 bg-slate-50 rounded-r-lg">
+                            <p class="text-xs font-bold text-emerald-600">Fixed: Street Light</p>
+                            <p class="text-[10px] text-slate-400 italic">Central Park • 1h ago</p>
+                        </div>
+                        <div class="border-l-4 border-orange-500 pl-4 py-1 bg-slate-50 rounded-r-lg">
+                            <p class="text-xs font-bold text-slate-800">Garbage Overflow</p>
+                            <p class="text-[10px] text-slate-400 italic">Market Lane • 2h ago</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-3 h-full relative projection-card rounded-[2.5rem] bg-slate-100 overflow-hidden border-4 border-white shadow-2xl">
+                <div id="city-map"></div>
+
+                <div class="absolute bottom-6 right-6 bg-white/90 backdrop-blur p-4 rounded-xl shadow-lg border border-slate-200 z-[1000]">
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2 text-[10px] font-bold uppercase text-slate-600">
+                            <span class="w-3 h-3 rounded-full bg-red-500"></span> Open Issues
+                        </div>
+                        <div class="flex items-center gap-2 text-[10px] font-bold uppercase text-slate-600">
+                            <span class="w-3 h-3 rounded-full bg-emerald-500"></span> Resolved
+                        </div>
+                        <div class="flex items-center gap-2 text-[10px] font-bold uppercase text-slate-600">
+                            <span class="w-3 h-3 rounded-full bg-orange-500"></span> In Progress
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="bg-slate-50 text-slate-700 border-t border-slate-200 pt-16 pb-8">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+                <div class="col-span-1 lg:col-span-1">
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="bg-emerald-600 p-1.5 rounded-lg"><i class="fas fa-robot text-white text-xl"></i></div>
+                        <span class="text-2xl font-bold text-slate-900 tracking-tight">Nagrik Sahayak</span>
+                    </div>
+                    <p class="text-slate-500 leading-relaxed">Simplifying civic action through AI-powered mapping and reporting.</p>
+                </div>
+            </div>
+            <div class="border-t border-slate-200 pt-8 text-center">
+                <div class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">© 2026 Nagrik Sahayak • Geospatial Division</div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
